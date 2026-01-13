@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tripura Rubber Prices</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Chart.js (for future graph feature) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="top-header">
+    <div class="top-bar">
+      <p id="updated-time" class="updated-time">Updating…</p>
+
+      <!-- Dark mode toggle -->
+      <button id="darkToggle" class="dark-toggle">
+        🌙 Dark
+      </button>
+    </div>
+
+    <div class="header-content">
+      <h1>Tripura Rubber Prices</h1>
+      <p>Live mandi & smoked rubber rates</p>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="container">
+
+    <!-- ===== RAW / MANDI ===== -->
+    <section class="section">
+      <h2>🌱 Raw / Mandi Rubber</h2>
+
+      <div class="grid">
+
+        <!-- Card template -->
+        <div class="card city-card" data-city="shreepur" data-type="sundry">
+          <h3>Shreepur</h3>
+          <div class="price-row">
+            <span id="shreepur-sundry" class="price loading">--</span>
+            <span id="shreepur-sundry-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="fatikroy" data-type="sundry">
+          <h3>Fatikroy</h3>
+          <div class="price-row">
+            <span id="fatikroy-sundry" class="price loading">--</span>
+            <span id="fatikroy-sundry-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="sarda" data-type="sundry">
+          <h3>Sarda</h3>
+          <div class="price-row">
+            <span id="sarda-sundry" class="price loading">--</span>
+            <span id="sarda-sundry-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="kumarghat" data-type="sundry">
+          <h3>Kumarghat</h3>
+          <div class="price-row">
+            <span id="kumarghat-sundry" class="price loading">--</span>
+            <span id="kumarghat-sundry-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="kanchanbari" data-type="sundry">
+          <h3>Kanchanbari</h3>
+          <div class="price-row">
+            <span id="kanchanbari-sundry" class="price loading">--</span>
+            <span id="kanchanbari-sundry-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SMOKED / SHEET ===== -->
+    <section class="section">
+      <h2>🔥 Smoked / Sheet Rubber</h2>
+
+      <div class="grid">
+
+        <div class="card city-card" data-city="shreepur" data-type="smoke">
+          <h3>Shreepur</h3>
+          <div class="price-row">
+            <span id="shreepur-smoke" class="price loading">--</span>
+            <span id="shreepur-smoke-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="fatikroy" data-type="smoke">
+          <h3>Fatikroy</h3>
+          <div class="price-row">
+            <span id="fatikroy-smoke" class="price loading">--</span>
+            <span id="fatikroy-smoke-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="sarda" data-type="smoke">
+          <h3>Sarda</h3>
+          <div class="price-row">
+            <span id="sarda-smoke" class="price loading">--</span>
+            <span id="sarda-smoke-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="kumarghat" data-type="smoke">
+          <h3>Kumarghat</h3>
+          <div class="price-row">
+            <span id="kumarghat-smoke" class="price loading">--</span>
+            <span id="kumarghat-smoke-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+        <div class="card city-card" data-city="kanchanbari" data-type="smoke">
+          <h3>Kanchanbari</h3>
+          <div class="price-row">
+            <span id="kanchanbari-smoke" class="price loading">--</span>
+            <span id="kanchanbari-smoke-arrow" class="arrow"></span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <p class="footer-text">
+      Updated automatically • Powered by Tripura Rubber Network
+    </p>
+
+  </main>
+
+  <!-- ===== GRAPH MODAL (hidden for now) ===== -->
+  <div id="graphModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeModal" class="close-btn">&times;</span>
+      <h3 id="graphTitle">Price History</h3>
+      <canvas id="priceChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>
