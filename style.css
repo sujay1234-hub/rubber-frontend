@@ -14,14 +14,14 @@
 }
 
 body {
-  background:#f4f7f6;
+  background:var(--bg);
   color:var(--text);
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .top-header {
   background:linear-gradient(135deg,var(--green-dark),var(--green));
-  padding:22px 20px 34px;
+  padding:20px 22px 32px; /* balanced vertical spacing */
   color:white;
 }
 
@@ -29,40 +29,68 @@ body {
   display:flex;
   justify-content:space-between;
   align-items:center;
+  margin-bottom:18px;
 }
 
+/* Last updated text */
+.top-bar p {
+  font-size:0.78rem;
+  opacity:0.85;
+  line-height:1.3;
+}
+
+/* Right side buttons */
 .top-actions {
   display:flex;
-  gap:10px;
+  gap:8px;
 }
 
+/* Navigation buttons */
 .nav-btn {
   padding:6px 14px;
   border-radius:999px;
   border:none;
-  background:rgba(255,255,255,.25);
+  background:rgba(255,255,255,.22);
   color:white;
-  font-size:.8rem;
+  font-size:0.78rem;
+  font-weight:500;
   cursor:pointer;
 }
 
 .nav-btn.active {
   background:white;
   color:var(--green-dark);
+  font-weight:600;
 }
 
+/* Dark toggle button */
 .dark-toggle {
-  padding:6px 12px;
+  padding:6px 10px;
   border-radius:999px;
   border:none;
+  font-size:0.85rem;
   cursor:pointer;
 }
 
+/* Header center content */
 .header-content {
   text-align:center;
-  margin-top:16px;
+  margin-top:6px;
 }
 
+.header-content h1 {
+  font-size:2.1rem;
+  font-weight:800;
+  letter-spacing:.4px;
+}
+
+.header-content p {
+  font-size:.9rem;
+  opacity:.85;
+  margin-top:6px;
+}
+
+/* ================= LAYOUT ================= */
 .container {
   max-width:1200px;
   margin:auto;
@@ -79,13 +107,14 @@ body {
   gap:26px;
 }
 
+/* ================= CARDS ================= */
 .card {
   background:white;
   border-radius:22px;
   padding:26px 20px;
   text-align:center;
   box-shadow:0 14px 40px rgba(0,0,0,.15);
-  transition:.3s;
+  transition:.3s ease;
 }
 
 .card:hover {
@@ -95,10 +124,11 @@ body {
 .card h3 {
   color:var(--muted);
   margin-bottom:12px;
+  font-size:.95rem;
 }
 
 .price {
-  font-size:2rem;
+  font-size:1.95rem;
   font-weight:800;
   color:var(--green-dark);
 }
@@ -107,6 +137,7 @@ body {
   content:"₹ ";
 }
 
+/* ================= CALCULATOR ================= */
 .calculator-card {
   max-width:420px;
   margin:auto;
@@ -120,13 +151,15 @@ label {
   color:var(--muted);
 }
 
-select,input {
+select,
+input {
   width:100%;
   padding:13px;
   border-radius:14px;
   border:none;
   background:#eef2f1;
   margin-top:6px;
+  font-size:.9rem;
 }
 
 button {
@@ -141,6 +174,7 @@ button {
   cursor:pointer;
 }
 
+/* Calculator result */
 #calc-result {
   margin-top:16px;
   font-weight:700;
@@ -148,6 +182,7 @@ button {
   text-align:center;
 }
 
+/* ================= FOOTER ================= */
 .footer-text {
   text-align:center;
   margin:60px 0 20px;
@@ -155,7 +190,7 @@ button {
   font-size:.8rem;
 }
 
-/* ===== GRAPH MODAL ===== */
+/* ================= GRAPH MODAL ================= */
 .modal {
   position:fixed;
   inset:0;
