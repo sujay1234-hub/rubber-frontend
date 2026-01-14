@@ -1,8 +1,10 @@
-const API_URL = "http://127.0.0.1:5000/api/prices";
-const HISTORY_URL = "http://127.0.0.1:5000/api/history";
+// ================= API CONFIG =================
+const BASE_URL = "https://rubber-backend.onrender.com";
+const API_URL = `${BASE_URL}/api/prices`;
+const HISTORY_URL = `${BASE_URL}/api/history`;
 
-const lastPrices = {}; // for arrow comparison
-let chart; // chart.js instance
+const lastPrices = {};
+let chart = null;
 
 // ================= LOAD PRICES =================
 async function loadPrices() {
@@ -14,16 +16,16 @@ async function loadPrices() {
     if (!data || !data.shreepur) return;
 
     // ---- last updated time ----
-    if (data.updatedAt) {
-      const t = new Date(data.updatedAt);
-      document.getElementById("updated-time").innerText =
-        "Last updated: " + t.toLocaleString();
+    const updatedEl = document.getElementById("updated-time");
+    if (updatedEl && data.updatedAt) {
+      updatedEl.innerText =
+        "Last updated: " + new Date(data.updatedAt).toLocaleString();
     }
 
     const setPrice = (id, value) => {
       const el = document.getElementById(id);
       const arrowEl = document.getElementById(id + "-arrow");
-      if (!el) return;
+      if (!el || value === undefined || value === null) return;
 
       // arrow logic
       if (lastPrices[id] !== undefined && arrowEl) {
@@ -39,7 +41,6 @@ async function loadPrices() {
       }
 
       lastPrices[id] = value;
-
       el.innerText = value;
       el.classList.remove("loading");
     };
@@ -59,42 +60,52 @@ async function loadPrices() {
     setPrice("kanchanbari-smoke", data.kanchanbari.smoke);
 
   } catch (err) {
-    console.error("Failed to load prices:", err);
+    console.error("❌ Failed to load prices:", err);
   }
 }
 
 // ================= DARK MODE =================
-const darkToggle = document.getElementById("darkToggle");
+document.addEventListener("DOMContentLoaded", () => {
+  const darkToggle = document.getElementById("darkToggle");
 
-if (localStorage.getItem("darkMode") === "on") {
-  document.body.classList.add("dark");
-}
+  if (localStorage.getItem("darkMode") === "on") {
+    document.body.classList.add("dark");
+  }
 
-darkToggle.onclick = () => {
-  document.body.classList.toggle("dark");
-  localStorage.setItem(
-    "darkMode",
-    document.body.classList.contains("dark") ? "on" : "off"
-  );
-};
-
-// ================= GRAPH MODAL =================
-document.querySelectorAll(".city-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const city = card.dataset.city;
-    const type = card.dataset.type;
-    openGraph(city, type);
-  });
+  if (darkToggle) {
+    darkToggle.onclick = () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem(
+        "darkMode",
+        document.body.classList.contains("dark") ? "on" : "off"
+      );
+    };
+  }
 });
 
-document.getElementById("closeModal").onclick = () => {
-  document.getElementById("graphModal").classList.add("hidden");
-};
+// ================= GRAPH MODAL =================
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".city-card").forEach(card => {
+    card.addEventListener("click", () => {
+      openGraph(card.dataset.city, card.dataset.type);
+    });
+  });
+
+  const closeBtn = document.getElementById("closeModal");
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      document.getElementById("graphModal")?.classList.add("hidden");
+    };
+  }
+});
 
 async function openGraph(city, type) {
   try {
     const res = await fetch(`${HISTORY_URL}?city=${city}&type=${type}`);
+    if (!res.ok) throw new Error("History API failed");
+
     const history = await res.json();
+    if (!Array.isArray(history)) return;
 
     const labels = history.map(h =>
       new Date(h.date).toLocaleDateString()
@@ -105,6 +116,7 @@ async function openGraph(city, type) {
       `${city.toUpperCase()} – ${type.toUpperCase()} Price History`;
 
     const ctx = document.getElementById("priceChart");
+    if (!ctx) return;
 
     if (chart) chart.destroy();
 
@@ -132,10 +144,12 @@ async function openGraph(city, type) {
     document.getElementById("graphModal").classList.remove("hidden");
 
   } catch (err) {
-    console.error("Graph load failed", err);
+    console.error("❌ Graph load failed:", err);
   }
 }
 
 // ================= INIT =================
-loadPrices();
-setInterval(loadPrices, 60000);
+document.addEventListener("DOMContentLoaded", () => {
+  loadPrices();
+  setInterval(loadPrices, 60000);
+});
