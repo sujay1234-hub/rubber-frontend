@@ -1,155 +1,123 @@
-// ================= API CONFIG =================
 const BASE_URL = "https://rubber-backend.onrender.com";
 const API_URL = `${BASE_URL}/api/prices`;
 const HISTORY_URL = `${BASE_URL}/api/history`;
 
-const lastPrices = {};
-let chart = null;
+let pricesData = {};
+let chart;
 
-// ================= LOAD PRICES =================
+// ELEMENTS
+const pricesSection = document.getElementById("pricesSection");
+const calculatorSection = document.getElementById("calculatorSection");
+
+const calcCity = document.getElementById("calc-city");
+const calcType = document.getElementById("calc-type");
+const calcKg = document.getElementById("calc-kg");
+const calcResult = document.getElementById("calc-result");
+
+const graphModal = document.getElementById("graphModal");
+const closeModal = document.getElementById("closeModal");
+const graphTitle = document.getElementById("graphTitle");
+const priceChart = document.getElementById("priceChart");
+
+// LOAD PRICES
 async function loadPrices() {
-  try {
-    const res = await fetch(API_URL);
-    if (!res.ok) throw new Error("API request failed");
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  pricesData = data;
 
-    const data = await res.json();
-    if (!data || !data.shreepur) return;
+  document.getElementById("updated-time").innerText =
+    "Last updated: " + new Date(data.updatedAt).toLocaleString();
 
-    // ---- last updated time ----
-    const updatedEl = document.getElementById("updated-time");
-    if (updatedEl && data.updatedAt) {
-      updatedEl.innerText =
-        "Last updated: " + new Date(data.updatedAt).toLocaleString();
+  for (let city in data) {
+    if (data[city].sundry !== undefined) {
+      document.getElementById(`${city}-sundry`).innerText = data[city].sundry;
+      document.getElementById(`${city}-smoke`).innerText = data[city].smoke;
     }
-
-    const setPrice = (id, value) => {
-      const el = document.getElementById(id);
-      const arrowEl = document.getElementById(id + "-arrow");
-      if (!el || value === undefined || value === null) return;
-
-      // arrow logic
-      if (lastPrices[id] !== undefined && arrowEl) {
-        if (value > lastPrices[id]) {
-          arrowEl.innerText = "↑";
-          arrowEl.className = "arrow up";
-        } else if (value < lastPrices[id]) {
-          arrowEl.innerText = "↓";
-          arrowEl.className = "arrow down";
-        } else {
-          arrowEl.innerText = "";
-        }
-      }
-
-      lastPrices[id] = value;
-      el.innerText = value;
-      el.classList.remove("loading");
-    };
-
-    // -------- Sundry --------
-    setPrice("shreepur-sundry", data.shreepur.sundry);
-    setPrice("fatikroy-sundry", data.fatikroy.sundry);
-    setPrice("sarda-sundry", data.sarda.sundry);
-    setPrice("kumarghat-sundry", data.kumarghat.sundry);
-    setPrice("kanchanbari-sundry", data.kanchanbari.sundry);
-
-    // -------- Smoke --------
-    setPrice("shreepur-smoke", data.shreepur.smoke);
-    setPrice("fatikroy-smoke", data.fatikroy.smoke);
-    setPrice("sarda-smoke", data.sarda.smoke);
-    setPrice("kumarghat-smoke", data.kumarghat.smoke);
-    setPrice("kanchanbari-smoke", data.kanchanbari.smoke);
-
-  } catch (err) {
-    console.error("❌ Failed to load prices:", err);
   }
 }
 
-// ================= DARK MODE =================
-document.addEventListener("DOMContentLoaded", () => {
-  const darkToggle = document.getElementById("darkToggle");
+// CALCULATOR
+function calculateAmount() {
+  const city = calcCity.value;
+  const type = calcType.value;
+  const kg = Number(calcKg.value);
 
-  if (localStorage.getItem("darkMode") === "on") {
-    document.body.classList.add("dark");
+  if (!kg || kg <= 0) {
+    calcResult.innerText = "❌ Enter valid KG";
+    return;
   }
 
-  if (darkToggle) {
-    darkToggle.onclick = () => {
-      document.body.classList.toggle("dark");
-      localStorage.setItem(
-        "darkMode",
-        document.body.classList.contains("dark") ? "on" : "off"
-      );
-    };
+  const total = pricesData[city][type] * kg;
+  calcResult.innerText = `💰 Total Amount: ₹ ${total.toLocaleString()}`;
+}
+
+// SECTION SWITCH
+function showSection(section) {
+  pricesSection.classList.add("hidden");
+  calculatorSection.classList.add("hidden");
+
+  document.querySelectorAll(".nav-btn")
+    .forEach(btn => btn.classList.remove("active"));
+
+  if (section === "prices") {
+    pricesSection.classList.remove("hidden");
+    document.querySelectorAll(".nav-btn")[0].classList.add("active");
+  } else {
+    calculatorSection.classList.remove("hidden");
+    document.querySelectorAll(".nav-btn")[1].classList.add("active");
   }
+}
+
+// GRAPH CLICK
+document.querySelectorAll(".city-card").forEach(card => {
+  card.addEventListener("click", () => {
+    openGraph(card.dataset.city, card.dataset.type);
+  });
 });
 
-// ================= GRAPH MODAL =================
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".city-card").forEach(card => {
-    card.addEventListener("click", () => {
-      openGraph(card.dataset.city, card.dataset.type);
-    });
+closeModal.onclick = () => graphModal.classList.add("hidden");
+
+// GRAPH
+async function openGraph(city, type) {
+  const res = await fetch(`${HISTORY_URL}?city=${city}&type=${type}`);
+  const history = await res.json();
+
+  graphTitle.innerText =
+    `${city.toUpperCase()} – ${type.toUpperCase()} Price History`;
+
+  const labels = history.map(h =>
+    new Date(h.date).toLocaleDateString()
+  );
+
+  const values = history.map(h => h.price);
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(priceChart, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        borderColor: "#16a34a",
+        backgroundColor: "rgba(22,163,74,0.25)",
+        fill: true,
+        tension: 0.35
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false }
+      }
+    }
   });
 
-  const closeBtn = document.getElementById("closeModal");
-  if (closeBtn) {
-    closeBtn.onclick = () => {
-      document.getElementById("graphModal")?.classList.add("hidden");
-    };
-  }
-});
-
-async function openGraph(city, type) {
-  try {
-    const res = await fetch(`${HISTORY_URL}?city=${city}&type=${type}`);
-    if (!res.ok) throw new Error("History API failed");
-
-    const history = await res.json();
-    if (!Array.isArray(history)) return;
-
-    const labels = history.map(h =>
-      new Date(h.date).toLocaleDateString()
-    );
-    const prices = history.map(h => h.price);
-
-    document.getElementById("graphTitle").innerText =
-      `${city.toUpperCase()} – ${type.toUpperCase()} Price History`;
-
-    const ctx = document.getElementById("priceChart");
-    if (!ctx) return;
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [{
-          label: "Price (₹)",
-          data: prices,
-          borderColor: "#43a047",
-          backgroundColor: "rgba(67,160,71,0.2)",
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
-
-    document.getElementById("graphModal").classList.remove("hidden");
-
-  } catch (err) {
-    console.error("❌ Graph load failed:", err);
-  }
+  graphModal.classList.remove("hidden");
 }
 
-// ================= INIT =================
+// INIT
 document.addEventListener("DOMContentLoaded", () => {
+  showSection("prices");
   loadPrices();
   setInterval(loadPrices, 60000);
 });
