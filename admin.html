@@ -1,139 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tripura Rubber Prices</title>
-
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>Admin Panel – Rubber Rates</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f5;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #1b5e20;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 6px;
+      margin-top: 4px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    button:hover {
+      background: #1b5e20;
+    }
+    .msg {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="top-header">
-  <div class="top-bar">
-    <p id="updated-time">Updating...</p>
+<h1>🛠️ Admin Panel – Rubber Rates</h1>
 
-    <div class="top-actions">
-      <button class="nav-btn active" onclick="showSection('prices')">📊 Prices</button>
-      <button class="nav-btn" onclick="showSection('calculator')">🧮 Calculator</button>
-      <button id="darkToggle" class="dark-toggle">🌙</button>
-    </div>
+<div class="grid">
+
+  <!-- SHREEPUR -->
+  <div class="card">
+    <h3>Shreepur</h3>
+    <label>Sundry</label>
+    <input id="shreepur-sundry" type="number">
+    <label>Smoke</label>
+    <input id="shreepur-smoke" type="number">
   </div>
 
-  <div class="header-content">
-    <h1>Tripura Rubber Prices</h1>
-    <p>Live mandi & smoked rubber rates</p>
+  <!-- FATIKROY -->
+  <div class="card">
+    <h3>Fatikroy</h3>
+    <label>Sundry</label>
+    <input id="fatikroy-sundry" type="number">
+    <label>Smoke</label>
+    <input id="fatikroy-smoke" type="number">
   </div>
-</header>
 
-<main class="container">
-
-<!-- ================= PRICES SECTION ================= -->
-<div id="pricesSection">
-
-<section class="section">
-  <h2>🌱 Raw / Mandi Rubber</h2>
-  <div class="grid">
-    <div class="card city-card" data-city="shreepur" data-type="sundry">
-      <h3>Shreepur</h3>
-      <div id="shreepur-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="fatikroy" data-type="sundry">
-      <h3>Fatikroy</h3>
-      <div id="fatikroy-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="sarda" data-type="sundry">
-      <h3>Sarda</h3>
-      <div id="sarda-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kumarghat" data-type="sundry">
-      <h3>Kumarghat</h3>
-      <div id="kumarghat-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kanchanbari" data-type="sundry">
-      <h3>Kanchanbari</h3>
-      <div id="kanchanbari-sundry" class="price">--</div>
-    </div>
+  <!-- SARDA -->
+  <div class="card">
+    <h3>Sarda</h3>
+    <label>Sundry</label>
+    <input id="sarda-sundry" type="number">
+    <label>Smoke</label>
+    <input id="sarda-smoke" type="number">
   </div>
-</section>
 
-<section class="section">
-  <h2>🔥 Smoked / Sheet Rubber</h2>
-  <div class="grid">
-    <div class="card city-card" data-city="shreepur" data-type="smoke">
-      <h3>Shreepur</h3>
-      <div id="shreepur-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="fatikroy" data-type="smoke">
-      <h3>Fatikroy</h3>
-      <div id="fatikroy-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="sarda" data-type="smoke">
-      <h3>Sarda</h3>
-      <div id="sarda-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kumarghat" data-type="smoke">
-      <h3>Kumarghat</h3>
-      <div id="kumarghat-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kanchanbari" data-type="smoke">
-      <h3>Kanchanbari</h3>
-      <div id="kanchanbari-smoke" class="price">--</div>
-    </div>
+  <!-- KUMARGHAT -->
+  <div class="card">
+    <h3>Kumarghat</h3>
+    <label>Sundry</label>
+    <input id="kumarghat-sundry" type="number">
+    <label>Smoke</label>
+    <input id="kumarghat-smoke" type="number">
   </div>
-</section>
+
+  <!-- KANCHANBARI -->
+  <div class="card">
+    <h3>Kanchanbari</h3>
+    <label>Sundry</label>
+    <input id="kanchanbari-sundry" type="number">
+    <label>Smoke</label>
+    <input id="kanchanbari-smoke" type="number">
+  </div>
 
 </div>
 
-<!-- ================= CALCULATOR SECTION ================= -->
-<div id="calculatorSection" class="hidden">
+<button onclick="savePrices()">💾 Save Prices</button>
+<div class="msg" id="msg"></div>
 
-<section class="section">
-  <h2>🧮 Rubber Calculator</h2>
+<script>
+const API = "https://rubber-backend.onrender.com/api/prices";
 
-  <div class="card calculator-card">
-    <label>City</label>
-    <select id="calc-city">
-      <option value="shreepur">Shreepur</option>
-      <option value="fatikroy">Fatikroy</option>
-      <option value="sarda">Sarda</option>
-      <option value="kumarghat">Kumarghat</option>
-      <option value="kanchanbari">Kanchanbari</option>
-    </select>
+// Load existing prices
+async function loadPrices() {
+  const res = await fetch(API);
+  const data = await res.json();
 
-    <label>Type</label>
-    <select id="calc-type">
-      <option value="sundry">Raw / Sundry</option>
-      <option value="smoke">Smoked / Sheet</option>
-    </select>
+  for (const place in data) {
+    document.getElementById(place + "-sundry").value = data[place].sundry;
+    document.getElementById(place + "-smoke").value = data[place].smoke;
+  }
+}
 
-    <label>Weight (KG)</label>
-    <input type="number" id="calc-kg" placeholder="Enter KG">
+// Save updated prices
+async function savePrices() {
+  const data = {
+    shreepur: {
+      sundry: Number(document.getElementById("shreepur-sundry").value),
+      smoke: Number(document.getElementById("shreepur-smoke").value)
+    },
+    fatikroy: {
+      sundry: Number(document.getElementById("fatikroy-sundry").value),
+      smoke: Number(document.getElementById("fatikroy-smoke").value)
+    },
+    sarda: {
+      sundry: Number(document.getElementById("sarda-sundry").value),
+      smoke: Number(document.getElementById("sarda-smoke").value)
+    },
+    kumarghat: {
+      sundry: Number(document.getElementById("kumarghat-sundry").value),
+      smoke: Number(document.getElementById("kumarghat-smoke").value)
+    },
+    kanchanbari: {
+      sundry: Number(document.getElementById("kanchanbari-sundry").value),
+      smoke: Number(document.getElementById("kanchanbari-smoke").value)
+    }
+  };
 
-    <button onclick="calculateAmount()">Calculate</button>
-    <div id="calc-result"></div>
-  </div>
-</section>
+  await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-</div>
+  document.getElementById("msg").innerText = "✅ Prices updated successfully!";
+}
 
-<p class="footer-text">
-  Updated automatically • Powered by Tripura Rubber Network
-</p>
+loadPrices();
+</script>
 
-</main>
-
-<!-- ================= GRAPH MODAL ================= -->
-<div id="graphModal" class="modal hidden">
-  <div class="modal-content">
-    <span id="closeModal" class="close-btn">&times;</span>
-    <h3 id="graphTitle"></h3>
-    <canvas id="priceChart"></canvas>
-  </div>
-</div>
-
-<script src="script.js"></script>
 </body>
 </html>
