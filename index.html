@@ -2,138 +2,810 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tripura Rubber Prices</title>
-
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tripura Rubber Network | Professional Dashboard</title>
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+  
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 
+  <style>
+    :root {
+      --primary: #0f3d2e;
+      --accent: #1fbf75;
+      --accent-glow: rgba(31, 191, 117, 0.4);
+      --text-main: #ffffff;
+      --text-muted: #a0aec0;
+      --glass-bg: rgba(15, 61, 46, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --card-radius: 16px;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #051a15;
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Three.js Background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+      display: none;
+      padding: 15px 20px;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .hamburger {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: white;
+    }
+
+    /* Layout */
+    .app-container {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--glass-border);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform 0.3s ease;
+    }
+
+    .brand {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 50px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links { list-style: none; flex: 1; }
+    .nav-links li { margin-bottom: 10px; }
+    
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px 15px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 20px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 30px 40px;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    /* Page Visibility Logic */
+    .page-section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    .page-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .header-title h1 { font-size: 1.8rem; font-weight: 600; }
+    .header-title p { color: var(--text-muted); font-size: 0.9rem; }
+
+    .date-badge {
+      background: rgba(255,255,255,0.1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      border: 1px solid var(--glass-border);
+    }
+
+    /* News Ticker */
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      background: rgba(31, 191, 117, 0.1);
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 10px 0;
+      margin-bottom: 30px;
+    }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+    }
+    .ticker-item {
+      display: inline-block;
+      padding: 0 2rem;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+    @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+    /* Grid System */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    /* Glass Cards */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--card-radius);
+      padding: 25px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .stat-card h3 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-card .value { font-size: 2rem; font-weight: 700; color: white; }
+    .stat-card .trend { font-size: 0.85rem; margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+    .trend.up { color: var(--success); }
+    .trend.down { color: var(--danger); }
+
+    /* Chart Section */
+    .chart-container {
+      grid-column: span 3;
+      height: 400px;
+    }
+
+    /* Widgets Section */
+    .widgets {
+      grid-column: span 1;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .weather-widget { text-align: center; }
+    .weather-temp { font-size: 2.5rem; font-weight: 700; margin: 10px 0; }
+    .weather-desc { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Calculator */
+    .calc-widget input, .calc-widget select {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--glass-border);
+      padding: 12px;
+      border-radius: 8px;
+      color: white;
+      margin-bottom: 10px;
+      font-family: inherit;
+    }
+    .calc-widget button {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .calc-result {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--glass-border);
+      text-align: center;
+    }
+    .calc-result span { display: block; font-size: 0.8rem; color: var(--text-muted); }
+    .calc-result strong { font-size: 1.4rem; color: var(--accent); display: block; margin-top: 5px; }
+
+    /* Data Table */
+    .table-container {
+      grid-column: span 4;
+      overflow-x: auto;
+    }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--glass-border); white-space: nowrap; }
+    th { color: var(--text-muted); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; }
+    .price-up { color: var(--success); font-weight: 600; }
+    .price-down { color: var(--danger); font-weight: 600; }
+
+    /* News Page */
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .news-item { border-bottom: 1px solid var(--glass-border); padding-bottom: 15px; }
+    .news-date { font-size: 0.8rem; color: var(--accent); margin-bottom: 5px; display: block; }
+    .news-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+
+    /* Settings */
+    .settings-group { margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; }
+    .toggle-switch { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; cursor: pointer; }
+
+    /* Sidebar Overlay */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 150;
+    }
+
+    /* ================= RESPONSIVE DESIGN ================= */
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-container { grid-column: span 2; }
+      .widgets { grid-column: span 2; flex-direction: row; }
+      .table-container { grid-column: span 2; }
+    }
+    
+    @media (max-width: 768px) {
+      .mobile-header { display: flex; }
+      
+      .app-container { grid-template-columns: 1fr; }
+      
+      .sidebar {
+        position: fixed;
+        left: -280px; /* Hide sidebar off-screen */
+        width: 260px;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+      }
+      
+      .sidebar.active {
+        transform: translateX(280px); /* Slide in */
+      }
+      
+      .sidebar-overlay.active {
+        display: block;
+      }
+
+      .main-content {
+        padding: 20px;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .header-title h1 { font-size: 1.5rem; }
+
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .chart-container { grid-column: span 1; height: 300px; }
+      .widgets { grid-column: span 1; flex-direction: column; }
+      .table-container { grid-column: span 1; }
+
+      .ticker-item { font-size: 0.8rem; padding: 0 1rem; }
+    }
+  </style>
+</head>
 <body>
 
-<header class="top-header">
-  <div class="top-bar">
-    <p id="updated-time">Updating...</p>
+  <!-- Three.js Background -->
+  <canvas id="bg-canvas"></canvas>
 
-    <div class="top-actions">
-      <button class="nav-btn active" onclick="showSection('prices')">📊 Prices</button>
-      <button class="nav-btn" onclick="showSection('calculator')">🧮 Calculator</button>
-      <button id="darkToggle" class="dark-toggle">🌙</button>
+  <!-- Mobile Header -->
+  <div class="mobile-header">
+    <div class="brand">
+      <i class="fas fa-leaf"></i> Tripura Rubber
+    </div>
+    <div class="hamburger" id="hamburger">
+      <i class="fas fa-bars"></i>
     </div>
   </div>
 
-  <div class="header-content">
-    <h1>Tripura Rubber Prices</h1>
-    <p>Live mandi & smoked rubber rates</p>
+  <!-- Overlay for Mobile -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <i class="fas fa-leaf"></i>
+        Tripura Rubber
+      </div>
+      
+      <ul class="nav-links">
+        <li><a href="#" class="nav-item active" data-target="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+        <li><a href="#" class="nav-item" data-target="mandi"><i class="fas fa-map-marker-alt"></i> Mandi Rates</a></li>
+        <li><a href="#" class="nav-item" data-target="calculator"><i class="fas fa-calculator"></i> Calculator</a></li>
+        <li><a href="#" class="nav-item" data-target="news"><i class="fas fa-newspaper"></i> Market News</a></li>
+        <li><a href="#" class="nav-item" data-target="settings"><i class="fas fa-cog"></i> Settings</a></li>
+      </ul>
+      
+      <div class="user-profile">
+        <div class="avatar">TN</div>
+        <div>
+          <div style="font-weight: 600; font-size: 0.9rem;">Tripura Network</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Admin Panel</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="page-section active">
+        <header>
+          <div class="header-title">
+            <h1>Market Overview</h1>
+            <p>Real-time rubber prices across Tripura mandis</p>
+          </div>
+          <div class="date-badge">
+            <i class="far fa-calendar-alt"></i> <span id="current-date"></span>
+          </div>
+        </header>
+
+        <div class="ticker-wrap">
+          <div class="ticker">
+            <div class="ticker-item"><i class="fas fa-bullhorn"></i> Shreepur mandi reports high demand</div>
+            <div class="ticker-item"><i class="fas fa-cloud-rain"></i> Weather Alert: Rain in Kumarghat</div>
+            <div class="ticker-item"><i class="fas fa-trending-up"></i> Global prices surge 2.5%</div>
+            <div class="ticker-item"><i class="fas fa-truck"></i> Transport strike called off</div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <!-- Chart -->
+          <div class="glass-card chart-container">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; gap:10px;">
+              <h3><i class="fas fa-chart-area"></i> Price Trend</h3>
+              <select style="background: transparent; border: 1px solid var(--glass-border); color: white; padding: 5px; border-radius: 5px;">
+                <option>Raw Rubber</option>
+                <option>Smoked Sheet</option>
+              </select>
+            </div>
+            <canvas id="mainChart"></canvas>
+          </div>
+
+          <!-- Widgets -->
+          <div class="glass-card widgets">
+            <div class="weather-widget">
+              <h3><i class="fas fa-cloud-sun"></i> Agartala</h3>
+              <div class="weather-temp" id="weather-temp">28°C</div>
+              <div class="weather-desc" id="weather-desc">Partly Cloudy</div>
+              <div style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted); text-align: left;">
+                <div><i class="fas fa-tint"></i> Humidity: <span id="humidity">72%</span></div>
+                <div style="margin-top: 5px;"><i class="fas fa-wind"></i> Wind: <span id="wind">12 km/h</span></div>
+              </div>
+            </div>
+
+            <!-- Calculator Widget -->
+            <div class="calc-widget">
+              <h3><i class="fas fa-calculator"></i> Profit Calc</h3>
+              <input type="number" id="calc-weight" placeholder="Weight (kg)">
+              <select id="calc-type">
+                <option value="192">Raw (₹192)</option>
+                <option value="188">Smoked (₹188)</option>
+              </select>
+              <input type="number" id="calc-cost" placeholder="Cost ₹" value="0">
+              <button onclick="calculateProfit()">Calculate</button>
+              <div class="calc-result">
+                <span>Profit</span>
+                <strong id="calc-profit">₹0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="glass-card table-container">
+            <h3><i class="fas fa-table"></i> Today's Mandi Rates</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Mandi</th>
+                  <th>Raw</th>
+                  <th>Chg</th>
+                  <th>Smoked</th>
+                  <th>Chg</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="price-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANDI PAGE -->
+      <div id="mandi" class="page-section">
+        <header>
+          <div class="header-title">
+            <h1>Mandi Rates</h1>
+            <p>Detailed breakdown for all markets</p>
+          </div>
+        </header>
+        <div class="glass-card">
+          <div style="display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;">
+            <button class="btn-filter active" style="background: var(--accent); border: none; padding: 8px 16px; border-radius: 20px; color: white; white-space: nowrap;">All</button>
+            <button class="btn-filter" style="background: rgba(255,255,255,0.1); border: none; padding: 8px 16px; border-radius: 20px; color: white; white-space: nowrap;">Raw Rubber</button>
+            <button class="btn-filter" style="background: rgba(255,255,255,0.1); border: none; padding: 8px 16px; border-radius: 20px; color: white; white-space: nowrap;">Smoked Sheet</button>
+          </div>
+          <table style="min-width: 500px;">
+            <thead>
+              <tr>
+                <th>Mandi</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Updated</th>
+                <th>Trend</th>
+              </tr>
+            </thead>
+            <tbody id="mandi-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CALCULATOR PAGE -->
+      <div id="calculator" class="page-section">
+        <header>
+          <div class="header-title">
+            <h1>Profit Calculator</h1>
+            <p>Estimate your earnings</p>
+          </div>
+        </header>
+        <div class="glass-card" style="max-width: 500px; margin: 0 auto;">
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--text-muted);">Type</label>
+            <select id="page-calc-type" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
+              <option value="192">Raw Rubber (₹192)</option>
+              <option value="188">Smoked Sheet (₹188)</option>
+            </select>
+          </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--text-muted);">Weight (kg)</label>
+            <input type="number" id="page-calc-weight" placeholder="Weight" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; color: var(--text-muted);">Costs (Labor/Transport)</label>
+            <input type="number" id="page-calc-cost" value="0" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; color: white;">
+          </div>
+          <button onclick="calculatePageProfit()" style="width: 100%; background: var(--accent); border: none; padding: 15px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">Calculate</button>
+          <div id="page-calc-result" style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; text-align: center; display: none;">
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Net Profit</div>
+            <div id="page-profit" style="font-size: 2rem; font-weight: 700; color: var(--success);">₹0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEWS PAGE -->
+      <div id="news" class="page-section">
+        <header>
+          <div class="header-title">
+            <h1>Market News</h1>
+            <p>Latest updates</p>
+          </div>
+        </header>
+        <div class="glass-card">
+          <div class="news-grid">
+            <div class="news-item">
+              <span class="news-date"><i class="far fa-clock"></i> 2 hours ago</span>
+              <h4 class="news-title">Global Prices Surge</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">International markets show positive trend.</p>
+            </div>
+            <div class="news-item">
+              <span class="news-date"><i class="far fa-clock"></i> 5 hours ago</span>
+              <h4 class="news-title">New Transport Routes</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Faster routes opened in Kumarghat.</p>
+            </div>
+            <div class="news-item">
+              <span class="news-date"><i class="far fa-clock"></i> 1 day ago</span>
+              <h4 class="news-title">Weather Advisory</h4>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Heavy rainfall expected. Cover sheets!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div id="settings" class="page-section">
+        <header>
+          <div class="header-title">
+            <h1>Settings</h1>
+            <p>Configuration</p>
+          </div>
+        </header>
+        <div class="glass-card" style="max-width: 500px;">
+          <div class="settings-group">
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-palette"></i> Appearance</h3>
+            <div class="toggle-switch">
+              <span>Dark Mode</span>
+              <i class="fas fa-moon" style="color: var(--accent);"></i>
+            </div>
+          </div>
+          <div class="settings-group">
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-bell"></i> Notifications</h3>
+            <div class="toggle-switch">
+              <span>Price Alerts</span>
+              <div style="width: 40px; height: 20px; background: var(--accent); border-radius: 20px; position: relative;">
+                <div style="width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-group" style="border-bottom: none;">
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-database"></i> Data</h3>
+            <button style="background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); padding: 10px; border-radius: 8px; cursor: pointer; width: 100%;">Clear Cache</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
   </div>
-</header>
 
-<main class="container">
+  <script>
+    // --- 1. Navigation ---
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page-section');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const hamburger = document.getElementById('hamburger');
 
-<!-- ================= PRICES SECTION ================= -->
-<div id="pricesSection">
+    function switchPage(targetId) {
+      pages.forEach(p => p.classList.remove('active'));
+      document.getElementById(targetId).classList.add('active');
+      
+      // Close mobile menu
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    }
 
-<section class="section">
-  <h2>🌱 Raw / Mandi Rubber</h2>
-  <div class="grid">
-    <div class="card city-card" data-city="shreepur" data-type="sundry">
-      <h3>Shreepur</h3>
-      <div id="shreepur-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="fatikroy" data-type="sundry">
-      <h3>Fatikroy</h3>
-      <div id="fatikroy-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="sarda" data-type="sundry">
-      <h3>Sarda</h3>
-      <div id="sarda-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kumarghat" data-type="sundry">
-      <h3>Kumarghat</h3>
-      <div id="kumarghat-sundry" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kanchanbari" data-type="sundry">
-      <h3>Kanchanbari</h3>
-      <div id="kanchanbari-sundry" class="price">--</div>
-    </div>
-  </div>
-</section>
+    navItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        navItems.forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+        switchPage(item.getAttribute('data-target'));
+      });
+    });
 
-<section class="section">
-  <h2>🔥 Smoked / Sheet Rubber</h2>
-  <div class="grid">
-    <div class="card city-card" data-city="shreepur" data-type="smoke">
-      <h3>Shreepur</h3>
-      <div id="shreepur-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="fatikroy" data-type="smoke">
-      <h3>Fatikroy</h3>
-      <div id="fatikroy-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="sarda" data-type="smoke">
-      <h3>Sarda</h3>
-      <div id="sarda-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kumarghat" data-type="smoke">
-      <h3>Kumarghat</h3>
-      <div id="kumarghat-smoke" class="price">--</div>
-    </div>
-    <div class="card city-card" data-city="kanchanbari" data-type="smoke">
-      <h3>Kanchanbari</h3>
-      <div id="kanchanbari-smoke" class="price">--</div>
-    </div>
-  </div>
-</section>
+    // Mobile Menu Toggle
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    });
+    
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    });
 
-</div>
+    // --- 2. Date ---
+    const dateEl = document.getElementById('current-date');
+    if(dateEl) dateEl.innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-<!-- ================= CALCULATOR SECTION ================= -->
-<div id="calculatorSection" class="hidden">
+    // --- 3. Three.js Background ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.position.z = 30;
 
-<section class="section">
-  <h2>🧮 Rubber Calculator</h2>
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 500;
+    const posArray = new Float32Array(particlesCount * 3);
+    for(let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 100;
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const material = new THREE.PointsMaterial({ size: 0.2, color: 0x1fbf75, transparent: true, opacity: 0.6 });
+    const particlesMesh = new THREE.Points(particlesGeometry, material);
+    scene.add(particlesMesh);
 
-  <div class="card calculator-card">
-    <label>City</label>
-    <select id="calc-city">
-      <option value="shreepur">Shreepur</option>
-      <option value="fatikroy">Fatikroy</option>
-      <option value="sarda">Sarda</option>
-      <option value="kumarghat">Kumarghat</option>
-      <option value="kanchanbari">Kanchanbari</option>
-    </select>
+    function animateParticles() {
+      particlesMesh.rotation.y += 0.001;
+      particlesMesh.rotation.x += 0.0005;
+      renderer.render(scene, camera);
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
 
-    <label>Type</label>
-    <select id="calc-type">
-      <option value="sundry">Raw / Sundry</option>
-      <option value="smoke">Smoked / Sheet</option>
-    </select>
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 
-    <label>Weight (KG)</label>
-    <input type="number" id="calc-kg" placeholder="Enter KG">
+    // --- 4. Chart.js ---
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(31, 191, 117, 0.5)');
+    gradient.addColorStop(1, 'rgba(31, 191, 117, 0.0)');
 
-    <button onclick="calculateAmount()">Calculate</button>
-    <div id="calc-result"></div>
-  </div>
-</section>
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Price',
+          data: [188, 189, 190, 191, 192, 191, 192],
+          borderColor: '#1fbf75',
+          backgroundColor: gradient,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#a0aec0' } },
+          x: { grid: { display: false }, ticks: { color: '#a0aec0' } }
+        }
+      }
+    });
 
-</div>
+    // --- 5. Data & Tables ---
+    const mandiData = [
+      { name: 'Shreepur', raw: 192, rawChange: 1.5, smoked: 188, smokedChange: 0.5, status: 'Active', updated: '10m ago' },
+      { name: 'Fatikroy', raw: 191, rawChange: 0.0, smoked: 187, smokedChange: -0.5, status: 'Active', updated: '15m ago' },
+      { name: 'Sarda', raw: 192, rawChange: 2.0, smoked: 188, smokedChange: 1.0, status: 'Active', updated: '5m ago' },
+      { name: 'Kumarghat', raw: 191, rawChange: -1.0, smoked: 187, smokedChange: -1.5, status: 'Active', updated: '20m ago' },
+      { name: 'Kanchanbari', raw: 190, rawChange: 0.5, smoked: 186, smokedChange: 0.0, status: 'Active', updated: '12m ago' },
+    ];
 
-<p class="footer-text">
-  Updated automatically • Powered by Tripura Rubber Network
-</p>
+    // Populate Dashboard Table
+    const tableBody = document.getElementById('price-table-body');
+    if (tableBody) {
+      mandiData.forEach(mandi => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${mandi.name}</strong></td>
+          <td>₹${mandi.raw}</td>
+          <td class="${mandi.rawChange >= 0 ? 'price-up' : 'price-down'}">${mandi.rawChange >= 0 ? '▲' : '▼'}</td>
+          <td>₹${mandi.smoked}</td>
+          <td class="${mandi.smokedChange >= 0 ? 'price-up' : 'price-down'}">${mandi.smokedChange >= 0 ? '▲' : '▼'}</td>
+          <td><span style="background: rgba(16,185,129,0.2); color: #10b981; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem;">${mandi.status}</span></td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
 
-</main>
+    // Populate Mandi Page Table
+    const mandiTableBody = document.getElementById('mandi-table-body');
+    if (mandiTableBody) {
+      mandiData.forEach(mandi => {
+        // Raw
+        let row = document.createElement('tr');
+        row.innerHTML = `<td><strong>${mandi.name}</strong></td><td><span style="background:rgba(31,191,117,0.2);color:#1fbf75;padding:2px 6px;border-radius:4px;font-size:0.7rem">Raw</span></td><td>₹${mandi.raw}</td><td>${mandi.updated}</td><td class="${mandi.rawChange>=0?'price-up':'price-down'}">${mandi.rawChange}%</td>`;
+        mandiTableBody.appendChild(row);
+        // Smoked
+        row = document.createElement('tr');
+                row.innerHTML = `<td><strong>${mandi.name}</strong></td><td><span style="background:rgba(160,174,192,0.2);color:#a0aec0;padding:2px 6px;border-radius:4px;font-size:0.7rem">Smoked</span></td><td>₹${mandi.smoked}</td><td>${mandi.updated}</td><td class="${mandi.smokedChange>=0?'price-up':'price-down'}">${mandi.smokedChange}%</td>`;
+        mandiTableBody.appendChild(row);
+      });
+    }
 
-<!-- ================= GRAPH MODAL ================= -->
-<div id="graphModal" class="modal hidden">
-  <div class="modal-content">
-    <span id="closeModal" class="close-btn">&times;</span>
-    <h3 id="graphTitle"></h3>
-    <canvas id="priceChart"></canvas>
-  </div>
-</div>
+    // --- 6. Calculator Functions ---
+    function calculateProfit() {
+      const weight = parseFloat(document.getElementById('calc-weight').value);
+      const price = parseFloat(document.getElementById('calc-type').value);
+      const cost = parseFloat(document.getElementById('calc-cost').value) || 0;
+      
+      if (!weight) return;
+      
+      const profit = (weight * price) - cost;
+      document.getElementById('calc-profit').innerText = `₹${profit.toLocaleString()}`;
+      document.getElementById('calc-profit').style.color = profit >= 0 ? 'var(--success)' : 'var(--danger)';
+    }
 
-<script src="script.js"></script>
+    function calculatePageProfit() {
+      const weight = parseFloat(document.getElementById('page-calc-weight').value);
+      const price = parseFloat(document.getElementById('page-calc-type').value);
+      const cost = parseFloat(document.getElementById('page-calc-cost').value) || 0;
+      const resultDiv = document.getElementById('page-calc-result');
+      
+      if (!weight) {
+        alert("Please enter weight");
+        return;
+      }
+      
+      const profit = (weight * price) - cost;
+      document.getElementById('page-profit').innerText = `₹${profit.toLocaleString()}`;
+      document.getElementById('page-profit').style.color = profit >= 0 ? 'var(--success)' : 'var(--danger)';
+      resultDiv.style.display = 'block';
+    }
+
+    // --- 7. Filter Buttons ---
+    const filterBtns = document.querySelectorAll('.btn-filter');
+    if (filterBtns.length > 0) {
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.style.background = 'rgba(255,255,255,0.1)');
+          btn.style.background = 'var(--accent)';
+        });
+      });
+    }
+  </script>
 </body>
 </html>
