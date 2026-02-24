@@ -332,13 +332,14 @@
       
       .sidebar {
         position: fixed;
-        left: -280px; /* Hide sidebar off-screen */
+        left: -280px;
         width: 260px;
         box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        overflow-y: auto;
       }
       
       .sidebar.active {
-        transform: translateX(280px); /* Slide in */
+        transform: translateX(280px);
       }
       
       .sidebar-overlay.active {
@@ -346,7 +347,7 @@
       }
 
       .main-content {
-        padding: 20px;
+        padding: 15px;
         height: auto;
         min-height: 100vh;
       }
@@ -354,17 +355,67 @@
       header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
+        gap: 10px;
+        margin-bottom: 15px;
       }
 
-      .header-title h1 { font-size: 1.5rem; }
+      .header-title h1 { font-size: 1.3rem; }
+      .header-title p { font-size: 0.8rem; }
+      .date-badge { font-size: 0.8rem; padding: 6px 12px; }
 
+      /* Stats grid: 2 columns on phone */
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .chart-container { grid-column: span 2; height: 240px; }
+      .widgets { grid-column: span 2; flex-direction: column; gap: 12px; }
+      .table-container { grid-column: span 2; }
+
+      /* Stat cards */
+      .stat-card .value { font-size: 1.5rem; }
+      .stat-card h3 { font-size: 0.75rem; }
+
+      /* Glass cards less padding */
+      .glass-card { padding: 15px; }
+
+      /* Weather widget */
+      .weather-temp { font-size: 2rem; }
+
+      /* Calculator widget inputs */
+      .calc-widget input, .calc-widget select { padding: 10px; font-size: 0.9rem; }
+
+      /* Tables: horizontal scroll */
+      .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      table { font-size: 0.85rem; }
+      th, td { padding: 9px 8px; }
+
+      /* News grid single column */
+      .news-grid { grid-template-columns: 1fr; }
+
+      /* Ticker */
+      .ticker-item { font-size: 0.78rem; padding: 0 0.8rem; }
+
+      /* Settings max-width */
+      .glass-card[style*="max-width"] { max-width: 100% !important; }
+
+      /* Filter buttons bar */
+      .btn-filter { padding: 7px 12px; font-size: 0.85rem; }
+
+      /* Prevent hover effects on touch */
+      .glass-card:hover { transform: none; }
+
+      /* Full-width buttons */
+      .calc-widget button { padding: 11px; }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 400px) {
       .dashboard-grid { grid-template-columns: 1fr; }
-      .chart-container { grid-column: span 1; height: 300px; }
-      .widgets { grid-column: span 1; flex-direction: column; }
+      .chart-container { grid-column: span 1; }
+      .widgets { grid-column: span 1; }
       .table-container { grid-column: span 1; }
-
-      .ticker-item { font-size: 0.8rem; padding: 0 1rem; }
+      .stat-card .value { font-size: 1.3rem; }
     }
   </style>
 </head>
